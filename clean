@@ -1,0 +1,4 @@
+echo "Cleaning up stuff in $1"
+cd $1
+echo "$(find . -name "*.class" -type f)"
+find . -name "*.class" -type f -delete
