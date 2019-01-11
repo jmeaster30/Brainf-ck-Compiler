@@ -1,13 +1,17 @@
 if [[ -n "$1" ]]; then
 	echo "Cleaning up stuff in $1"
-	cd $1
-	FILES=$(find . -name "*.class" -type f)
-	if [[ -n "$FILES" ]]; then
-		echo "$FILES"
-		find . -name "*.class" -type f -delete
-	elif [[ -z "$FILES" ]]; then
-		echo "Folder is clean."
+	if [[ "$1" == "java" ]]; then
+		cd $1
+		FILES=$(find . \( -iname "*.class" -o -iname "*.txt" \) -type f)
+		if [[ -n "$FILES" ]]; then
+			echo "$FILES"
+			find . \( -iname "*.class" -o -iname "*.txt" \) -type f -delete
+		elif [[ -z "$FILES" ]]; then
+			echo "Folder is clean."
+		fi
+	else
+		echo "that folder does not exist"
 	fi
-elif [[ -z "$1" ]]; then
+else
 	echo "specify a folder to clean pls"
-fijav
+fi

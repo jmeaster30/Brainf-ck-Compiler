@@ -31,10 +31,57 @@ public class BFC
 			command = c;
 			value = val;
 		}
+		
+		public String getString()
+		{
+			return command.name() + " " + Integer.toString(value);
+		}
 	}
 	
 	public static int interpret(String program)
 	{
+		int stringLength = program.length();
+		for(int i = 0; i < stringLength; i++)
+		{
+			//initialize the memory with 30,000 entries since that is the maximum memory of the initial specification
+			//memory will be infinite
+			ArrayList<Byte> memory = new ArrayList<Byte>(30000); 
+			int pointerPosition = 0;
+			char c = program.charAt(i);
+			switch(c)
+			{
+				case '<':
+					if(pointerPosition > 0) pointerPosition--;
+					break;
+				case '>':
+					if(pointerPosition < memory.size() - 1) pointerPosition++;
+					else if(pointerPosition == memory.size() - 1)
+					{
+						ArrayList<Byte> newMemory = new ArrayList<Byte>(30000);
+						newMemory.addAll(0, memory);
+						memory = newMemory;
+						pointerPosition++;
+					}
+					break;
+				case '+':
+					memory.get(pointerPosition) += 1;
+					break;
+				case '-':
+					memory.get(pointerPosition) -= 1;
+					break;
+				case '[':
+					break;
+				case ']':
+					break;
+				case '.':
+					break;
+				case ',':
+					break;
+				default:
+					//noop
+					break;
+			}
+		}
 		return 0;
 	}
 	
@@ -42,7 +89,7 @@ public class BFC
 	{
 		int loopLevel = 0;
 		int listLength = list.size();
-		for(int i = listLength - 1; i >= 0; i--)
+		for(int i = listLength - 1; i > 0; i--)
 		{
 			boolean fold = false;
 			Instruction curr = list.get(i);
@@ -119,6 +166,7 @@ public class BFC
 					//shouldn't get here since the cases cover every possible char in the program string
 					break;
 			}
+			list.add(item);
 		}
 		return list;
 	}
@@ -126,6 +174,11 @@ public class BFC
 	public static int compile(String program)
 	{
 		ArrayList<Instruction> instructionList = generateInstructionList(program);
+		foldInstructions(instructionList);
+		for(Instruction inst : instructionList)
+		{
+			System.out.println(inst.getString());
+		}
 		return 0;
 	}	
 	
@@ -146,7 +199,7 @@ public class BFC
 		int i = 0;
 		for(String arg : args)
 		{
-			//System.out.println(arg + " == " + args[i]);
+			System.out.println(arg + " == " + args[i]);
 			if(arg.equals("-o")) outputname = args[i + 1];
 			if(arg.equals("-c")) comp = true;
 			if(arg.equals("-i")) interp = true;
@@ -170,5 +223,9 @@ public class BFC
 		{
 			e.printStackTrace();
 		}
+		
+		System.out.println(program);
+		if(interp) interpret(program);
+		if(comp) compile(program);
 	}
 }
