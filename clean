@@ -1,4 +1,13 @@
-echo "Cleaning up stuff in $1"
-cd $1
-echo "$(find . -name "*.class" -type f)"
-find . -name "*.class" -type f -delete
+if [[ -n "$1" ]]; then
+	echo "Cleaning up stuff in $1"
+	cd $1
+	FILES=$(find . -name "*.class" -type f)
+	if [[ -n "$FILES" ]]; then
+		echo "$FILES"
+		find . -name "*.class" -type f -delete
+	elif [[ -z "$FILES" ]]; then
+		echo "Folder is clean."
+	fi
+elif [[ -z "$1" ]]; then
+	echo "specify a folder to clean pls"
+fijav
