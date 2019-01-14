@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.*;
 import java.io.*;
 
 public class BFC
@@ -41,12 +41,11 @@ public class BFC
 	public static int interpret(String program)
 	{
 		int stringLength = program.length();
+		ArrayList<Character> memory = new ArrayList<Character>();
+		Deque<Integer> loopStack = new ArrayDeque<Integer>();
+		int pointerPosition = 0;
 		for(int i = 0; i < stringLength; i++)
 		{
-			//initialize the memory with 30,000 entries since that is the maximum memory of the initial specification
-			//memory will be infinite
-			ArrayList<Byte> memory = new ArrayList<Byte>(30000); 
-			int pointerPosition = 0;
 			char c = program.charAt(i);
 			switch(c)
 			{
@@ -57,25 +56,40 @@ public class BFC
 					if(pointerPosition < memory.size() - 1) pointerPosition++;
 					else if(pointerPosition == memory.size() - 1)
 					{
-						ArrayList<Byte> newMemory = new ArrayList<Byte>(30000);
-						newMemory.addAll(0, memory);
-						memory = newMemory;
+						memory.add((char)0);
 						pointerPosition++;
 					}
 					break;
 				case '+':
-					memory.get(pointerPosition) += 1;
+					if(pointerPosition >= memory.size())
+						memory.add((char)1);
+					else
+						memory.set(pointerPosition, (char)(memory.get(pointerPosition) + 1));
 					break;
 				case '-':
-					memory.get(pointerPosition) -= 1;
+					if(pointerPosition >= memory.size())
+						memory.add((char)(-1));
+					else
+						memory.set(pointerPosition, (char)(memory.get(pointerPosition) - 1));
 					break;
 				case '[':
+					loopStack.addFirst(i - 1);
 					break;
 				case ']':
+					if(!memory.get(pointerPosition).equals('\0'))//go back to start of loop
+						i = loopStack.removeFirst();
+					else//remove loop from loop stack
+						loopStack.removeFirst();
 					break;
 				case '.':
+					//output
+					System.out.print(memory.get(pointerPosition));// + " " + memory.get(pointerPosition).hashCode());
 					break;
 				case ',':
+					//input
+					Scanner sc = new Scanner(System.in);
+					char b = (char)sc.nextByte();
+					memory.set(pointerPosition, b);
 					break;
 				default:
 					//noop
