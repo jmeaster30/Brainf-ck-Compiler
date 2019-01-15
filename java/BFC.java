@@ -40,56 +40,65 @@ public class BFC
 	
 	public static int interpret(String program)
 	{
-		int stringLength = program.length();
+		ArrayList<Instruction> instructionList = generateInstructionList(program);
+		foldInstructions(instructionList);
+		matchLoopBrackets(instructionList);
+		int programLength = instructionList.size();
 		ArrayList<Character> memory = new ArrayList<Character>();
 		Deque<Integer> loopStack = new ArrayDeque<Integer>();
 		int pointerPosition = 0;
-		for(int i = 0; i < stringLength; i++)
+		for(int i = 0; i < programLength; i++)
 		{
-			char c = program.charAt(i);
-			switch(c)
+			Instruction inst = instructionList.get(i);
+			switch(inst.command)
 			{
-				case '<':
-					if(pointerPosition > 0) pointerPosition--;
+				case LEFT:
+					if(pointerPosition > inst.value) 
+						pointerPosition -= inst.value;
+					else
+						pointerPosition = 0;
 					break;
-				case '>':
-					if(pointerPosition < memory.size() - 1) pointerPosition++;
-					else if(pointerPosition == memory.size() - 1)
+				case RIGHT:
+					if(pointerPosition < memory.size() - inst.value - 1) 
+						pointerPosition += inst.value;
+					else if(pointerPosition >= memory.size() - inst.value - 1)
 					{
-						memory.add((char)0);
-						pointerPosition++;
+						for(int j = 0; j < inst.value + 1; j++)
+							memory.add((char)0);
+						pointerPosition += inst.value;
 					}
 					break;
-				case '+':
+				case ADD:
 					if(pointerPosition >= memory.size())
-						memory.add((char)1);
+						memory.add((char)(inst.value));
 					else
-						memory.set(pointerPosition, (char)(memory.get(pointerPosition) + 1));
+						memory.set(pointerPosition, (char)(memory.get(pointerPosition) + inst.value));
 					break;
-				case '-':
+				case SUB:
 					if(pointerPosition >= memory.size())
-						memory.add((char)(-1));
+						memory.add((char)(-inst.value));
 					else
-						memory.set(pointerPosition, (char)(memory.get(pointerPosition) - 1));
+						memory.set(pointerPosition, (char)(memory.get(pointerPosition) - inst.value));
 					break;
-				case '[':
-					loopStack.addFirst(i - 1);
+				case START:
+					if(memory.get(pointerPosition).equals((char)0))//go back to start of loop
+						i = inst.value;
 					break;
-				case ']':
-					if(!memory.get(pointerPosition).equals('\0'))//go back to start of loop
-						i = loopStack.removeFirst();
-					else//remove loop from loop stack
-						loopStack.removeFirst();
+				case END:
+					if(!memory.get(pointerPosition).equals((char)0))//go back to start of loop
+						i = inst.value;
 					break;
-				case '.':
+				case OUTPUT:
 					//output
-					System.out.print(memory.get(pointerPosition));// + " " + memory.get(pointerPosition).hashCode());
+					if(pointerPosition < memory.size())
+						System.out.print(memory.get(pointerPosition));
 					break;
-				case ',':
+				case INPUT:
 					//input
 					Scanner sc = new Scanner(System.in);
 					char b = (char)sc.nextByte();
 					memory.set(pointerPosition, b);
+					sc.close();
 					break;
 				default:
 					//noop
@@ -97,6 +106,26 @@ public class BFC
 			}
 		}
 		return 0;
+	}
+	
+	public static void matchLoopBrackets(ArrayList<Instruction> list)
+	{
+		Deque<Integer> loopStartIndex = new ArrayDeque<Integer>();
+		for(int i = 0; i < list.size(); i++)
+		{
+			Instruction inst = list.get(i);
+			if(inst.command == Command.START)
+			{
+				loopStartIndex.addFirst(i);
+			}
+			else if(inst.command == Command.END)
+			{
+				int index = loopStartIndex.removeFirst();
+				Instruction start = list.get(index);
+				inst.value = index;
+				start.value = i;
+			}
+		}
 	}
 	
 	public static void foldInstructions(ArrayList<Instruction> list)
@@ -112,10 +141,10 @@ public class BFC
 			{
 				case START:
 					curr.value = loopLevel;
-					loopLevel -= 1;
+					loopLevel += 1;
 					break;
 				case END:
-					loopLevel += 1;
+					loopLevel -= 1;
 					curr.value = loopLevel;
 					break;
 				case LEFT:
@@ -213,7 +242,7 @@ public class BFC
 		int i = 0;
 		for(String arg : args)
 		{
-			System.out.println(arg + " == " + args[i]);
+			//System.out.println(arg + " == " + args[i]);
 			if(arg.equals("-o")) outputname = args[i + 1];
 			if(arg.equals("-c")) comp = true;
 			if(arg.equals("-i")) interp = true;
@@ -238,7 +267,7 @@ public class BFC
 			e.printStackTrace();
 		}
 		
-		System.out.println(program);
+		//System.out.println(program);
 		if(interp) interpret(program);
 		if(comp) compile(program);
 	}
