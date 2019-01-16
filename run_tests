@@ -5,6 +5,7 @@ if [[ -n "$1" ]]; then
 		TESTS=(../tests/*)
 		javac BFC.java
 		for f in "${TESTS[@]}"; do
+			echo "****** Executing test $f ******"
 			java BFC -i $f
 			echo ""
 		done
@@ -12,7 +13,7 @@ if [[ -n "$1" ]]; then
 	else
 		echo "that folder does not exist"
 	fi
+	./clean $1
 else
 	echo "Specify which folder to run the tests from"
 fi
-./clean $1
