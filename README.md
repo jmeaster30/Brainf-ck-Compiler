@@ -2,4 +2,17 @@
 
 This is an interpreter/compiler for the Brainf*ck esoteric programming language.
 
-I am creating this since I am interested in how compilers work and I chose Brainf*ck since it is a simple language consisting of only 8 symbols: '+', '-', '<', '>', '[', ']', ',', and '.'.
+Once you build either the java or the c version* of this program run it like any other program but there are flags to control the program a bit:
+
+
+the file you want to interpret or compile will be the last parameter
+
+
+the -i flag means you want to interpret the file
+
+the -c flag means you want to compile the file
+
+--both of these flags can be put in you will just recieve the interpreted output right away and a compiled executable
+
+
+the -o \<filename\> will cause the compiled executable to be named "\<filename\>"
