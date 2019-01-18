@@ -51,6 +51,10 @@ public class BFC
 			Interpreter interpreter = new Interpreter(program);
 			interpreter.interpret();
 		}			
-		//if(comp) Compiler.compile(program);
+		if(comp)
+		{
+			Compiler compiler = new Compiler(program, (outputname == null) ? "out" : outputname);
+			compiler.compile();
+		}
 	}
 }

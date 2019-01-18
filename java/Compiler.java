@@ -35,29 +35,49 @@ public class Compiler
 		{
 			return command.name() + " " + Integer.toString(value);
 		}
-	}
-	
-	public static void matchLoopBrackets(ArrayList<Instruction> list)
-	{
-		Deque<Integer> loopStartIndex = new ArrayDeque<Integer>();
-		for(int i = 0; i < list.size(); i++)
+		
+		public boolean equals(Object o)
 		{
-			Instruction inst = list.get(i);
-			if(inst.command == Command.START)
-			{
-				loopStartIndex.addFirst(i);
-			}
-			else if(inst.command == Command.END)
-			{
-				int index = loopStartIndex.removeFirst();
-				Instruction start = list.get(index);
-				inst.value = index;
-				start.value = i;
-			}
+			if(o == null) return false;
+			if(!(o instanceof Instruction)) return false;
+			if(command == ((Instruction)o).command && value == ((Instruction)o).value) return true;
+			return false;
 		}
 	}
 	
-	public static void foldInstructions(ArrayList<Instruction> list)
+	private String program;
+	private String outputFilename;
+	
+	
+	public Compiler(String p, String o)
+	{
+		program = p;
+		outputFilename = o;
+	}
+	
+	//public void matchLoopBrackets(ArrayList<Instruction> list)
+	//{
+	//	Deque<Integer> loopStartIndex = new ArrayDeque<Integer>();
+	//	for(int i = 0; i < list.size(); i++)
+	//	{
+	//		Instruction inst = list.get(i);
+	//		if(inst.command == Command.START)
+	//		{
+	//			loopStartIndex.addFirst(i);
+	//		}
+	//		else if(inst.command == Command.END)
+	///		{
+	//			int index = loopStartIndex.removeFirst();
+	//			Instruction start = list.get(index);
+	//			inst.value = index;
+	//			start.value = i;
+	//		}
+	//	}
+	//}
+	
+	//this functions folds instructions that are repeated.
+	//the resulting list is shorter and thus when it is compiled it is optimized slightly
+	public void foldInstructions(ArrayList<Instruction> list)
 	{
 		int loopLevel = 0;
 		int listLength = list.size();
@@ -70,10 +90,10 @@ public class Compiler
 			{
 				case START:
 					curr.value = loopLevel;
-					loopLevel += 1;
+					loopLevel -= 1;
 					break;
 				case END:
-					loopLevel -= 1;
+					loopLevel += 1;
 					curr.value = loopLevel;
 					break;
 				case LEFT:
@@ -99,7 +119,8 @@ public class Compiler
 		}
 	}
 	
-	public static ArrayList<Instruction> generateInstructionList(String program)
+	//turns the string into a list of instructions
+	public ArrayList<Instruction> generateInstructionList(String program)
 	{
 		ArrayList<Instruction> list = new ArrayList<Instruction>();
 		int stringLength = program.length();
@@ -143,13 +164,28 @@ public class Compiler
 		return list;
 	}
 	
-	public static int compile(String program)
+	//this will calculate an estimate for the amount of memory needed
+	//this should give the exact memory size in some cases. some loops can cause the memory needed to be bigger than the number given here
+	//I believe it is impossible to determine the max memory require since the memory is thoretically infinite
+	public int minimumMemory(ArrayList<Instruction> list)
+	{
+		int mem = 0;
+		for(Instruction inst : list)
+			if(inst.command == Command.LEFT) mem += inst.value;
+		return mem;
+	}
+	
+	//compiles the program
+	//for now it will just generate c code
+	public int compile()
 	{
 		ArrayList<Instruction> instructionList = generateInstructionList(program);
 		foldInstructions(instructionList);
+		int memRequired = minimumMemory(instructionList);
+		System.out.println(memRequired);
 		for(Instruction inst : instructionList)
 		{
-			System.out.println(inst.getString());
+			//System.out.println(inst.getString());
 		}
 		return 0;
 	}

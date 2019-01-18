@@ -123,6 +123,7 @@ public class Interpreter
 		int error = 0;
 		while(pc < programLength)
 			error = interpret(program.charAt(pc));
+		//System.out.println(memory.size());
 		return error;
 	}
 }
