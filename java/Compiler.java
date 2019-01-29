@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 public class Compiler
 {	
@@ -123,7 +124,7 @@ public class Compiler
 	
 	//this function will give an over estimate of the memory needed to run the program
 	//I believe it is impossible to determine the max memory require since the memory is thoretically infinite
-	public int minimumMemory(ArrayList<Instruction> list)
+	public int memoryNeeded(ArrayList<Instruction> list)
 	{
 		int mem = 1;
 		int i = 1;
@@ -149,6 +150,48 @@ public class Compiler
 		return mem;
 	}
 	
+	//this function outputs the optimized instructions into a file
+	//for now we will output into c code
+	public int outputFile(ArrayList<Instruction> list)
+	{
+		BufferedWriter out = null;
+		BufferedReader in = null;
+		
+		try
+		{
+			out = new BufferedWriter(new FileWriter(outputFilename + ".c"));
+			in = new BufferedReader(new FileReader("base.c"));
+			int c;
+			while ((c = in.read()) != -1) 
+			{
+				out.write(c);
+				out.flush();
+			}
+			in.close();
+			int memRequired = memoryNeeded(list);
+			String str = "mem = (unsigned char*)malloc(sizeof(unsigned char) * " + Integer.toString(memRequired) + ");";
+			for(int i = 0; i < str.length(); i++)
+			{
+				out.write((int)(str.charAt(i)));
+			}
+			for(Instruction inst : list)
+			{
+				
+			}
+			str = "return 0;}";
+			for(int i = 0; i < str.length(); i++)
+			{
+				out.write((int)(str.charAt(i)));
+			}
+			out.flush();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
 	//compiles the program
 	//for now it will just generate c code
 	public int compile()
@@ -159,8 +202,7 @@ public class Compiler
 		{
 			//System.out.println(inst.getString());
 		}
-		int memRequired = minimumMemory(instructionList);
-		//System.out.println(memRequired);
+		outputFile(instructionList);
 		return 0;
 	}
 }

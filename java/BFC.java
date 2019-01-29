@@ -39,6 +39,7 @@ public class BFC
 				   c == '[' || c == ']' || c == '<' || c == '>')
 					program += (char)c;
 			}
+			in.close();
 		}
 		catch(Exception e)
 		{
