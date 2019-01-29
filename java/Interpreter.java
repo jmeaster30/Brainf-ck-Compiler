@@ -113,7 +113,6 @@ public class Interpreter
 			//noop
 				break;
 		}
-	
 		pc++;
 		return error;
 	}
@@ -123,7 +122,7 @@ public class Interpreter
 		int error = 0;
 		while(pc < programLength)
 			error = interpret(program.charAt(pc));
-		//System.out.println(memory.size());
+		System.out.println("\n" + memory.size());
 		return error;
 	}
 }

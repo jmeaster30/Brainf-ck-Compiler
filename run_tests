@@ -6,7 +6,7 @@ if [[ -n "$1" ]]; then
 		javac BFC.java
 		for f in "${TESTS[@]}"; do
 			echo "****** Executing test $f ******"
-			java BFC -i $f
+			java BFC -c -i $f
 			echo ""
 		done
 		cd ..

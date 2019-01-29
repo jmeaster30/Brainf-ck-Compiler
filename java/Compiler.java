@@ -1,50 +1,7 @@
 import java.util.*;
 
 public class Compiler
-{
-	public static enum Command
-	{
-		START,
-		END,
-		LEFT,
-		RIGHT,
-		ADD,
-		SUB,
-		OUTPUT,
-		INPUT;
-	}
-	
-	public static class Instruction
-	{
-		public Command command;
-		public int value;
-		
-		public Instruction()
-		{
-			command = null;
-			value = 0;
-		}
-		
-		public Instruction(Command c, int val)
-		{
-			command = c;
-			value = val;
-		}
-		
-		public String getString()
-		{
-			return command.name() + " " + Integer.toString(value);
-		}
-		
-		public boolean equals(Object o)
-		{
-			if(o == null) return false;
-			if(!(o instanceof Instruction)) return false;
-			if(command == ((Instruction)o).command && value == ((Instruction)o).value) return true;
-			return false;
-		}
-	}
-	
+{	
 	private String program;
 	private String outputFilename;
 	
@@ -164,14 +121,31 @@ public class Compiler
 		return list;
 	}
 	
-	//this will calculate an estimate for the amount of memory needed
-	//this should give the exact memory size in some cases. some loops can cause the memory needed to be bigger than the number given here
+	//this function will give an over estimate of the memory needed to run the program
 	//I believe it is impossible to determine the max memory require since the memory is thoretically infinite
 	public int minimumMemory(ArrayList<Instruction> list)
 	{
-		int mem = 0;
+		int mem = 1;
+		int i = 1;
 		for(Instruction inst : list)
-			if(inst.command == Command.LEFT) mem += inst.value;
+		{
+			if(inst.command == Command.RIGHT)
+			{
+				if(i == mem)
+				{
+					mem++;
+					i++;
+				}
+				else
+				{
+					i++;
+				}
+			}
+			else if(inst.command == Command.LEFT)
+			{
+				if(i != 0) i--;
+			}
+		}
 		return mem;
 	}
 	
@@ -181,12 +155,12 @@ public class Compiler
 	{
 		ArrayList<Instruction> instructionList = generateInstructionList(program);
 		foldInstructions(instructionList);
-		int memRequired = minimumMemory(instructionList);
-		System.out.println(memRequired);
 		for(Instruction inst : instructionList)
 		{
 			//System.out.println(inst.getString());
 		}
+		int memRequired = minimumMemory(instructionList);
+		//System.out.println(memRequired);
 		return 0;
 	}
 }
