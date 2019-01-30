@@ -150,6 +150,19 @@ public class Compiler
 		return mem;
 	}
 	
+	public void write(String str, BufferedWriter out)
+	{
+		try
+		{
+			for(int i = 0; i < str.length(); i++)
+				out.write((int)(str.charAt(i)));
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	//this function outputs the optimized instructions into a file
 	//for now we will output into c code
 	public int outputFile(ArrayList<Instruction> list)
@@ -165,24 +178,46 @@ public class Compiler
 			while ((c = in.read()) != -1) 
 			{
 				out.write(c);
-				out.flush();
+				//out.flush();
 			}
 			in.close();
 			int memRequired = memoryNeeded(list);
-			String str = "mem = (unsigned char*)malloc(sizeof(unsigned char) * " + Integer.toString(memRequired) + ");";
-			for(int i = 0; i < str.length(); i++)
-			{
-				out.write((int)(str.charAt(i)));
-			}
+			String str = "mem = (unsigned char*)malloc(sizeof(unsigned char) * " + Integer.toString(memRequired) + "); memset(mem, 0, sizeof(unsigned char) * " + Integer.toString(memRequired) + "); ";
+			//write(str, out);
 			for(Instruction inst : list)
 			{
-				
+				switch(inst.command)
+				{
+					case ADD:
+						str += "mem[mempos] += " + Integer.toString(inst.value) + "; ";
+						break;
+					case SUB:
+						str += "mem[mempos] -= " + Integer.toString(inst.value) + "; ";
+						break;
+					case LEFT:
+						str += "mempos -= " + Integer.toString(inst.value) + "; ";
+						break;
+					case RIGHT:
+						str += "mempos += " + Integer.toString(inst.value) + "; "; 
+						break;
+					case START:
+						str += "while(mem[mempos] != 0){ ";
+						break;
+					case END:
+						str += " } ";
+						break;
+					case OUTPUT:
+						str += "printf(\"%c\", mem[mempos]); ";
+						break;
+					case INPUT:
+						str += "scanf(\" %c\", &(mem[mempos])); ";
+						break;
+					default:
+						break;
+				}
 			}
-			str = "return 0;}";
-			for(int i = 0; i < str.length(); i++)
-			{
-				out.write((int)(str.charAt(i)));
-			}
+			str += "return 0;} ";
+			write(str, out);
 			out.flush();
 		}
 		catch(Exception e)
