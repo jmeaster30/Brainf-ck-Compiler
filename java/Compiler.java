@@ -173,7 +173,7 @@ public class Compiler
 		try
 		{
 			out = new BufferedWriter(new FileWriter(outputFilename + ".c"));
-			in = new BufferedReader(new FileReader("base.c"));
+			in = new BufferedReader(new FileReader("base.base"));
 			int c;
 			while ((c = in.read()) != -1) 
 			{
@@ -182,41 +182,60 @@ public class Compiler
 			}
 			in.close();
 			int memRequired = memoryNeeded(list);
-			String str = "mem = (unsigned char*)malloc(sizeof(unsigned char) * " + Integer.toString(memRequired) + "); memset(mem, 0, sizeof(unsigned char) * " + Integer.toString(memRequired) + "); ";
+			int looplevel = 1;
+			String str = "\tmem = (unsigned char*)malloc(sizeof(unsigned char) * " + Integer.toString(memRequired) + ");\n\tmemset(mem, 0, sizeof(unsigned char) * " + Integer.toString(memRequired) + ");\n";
 			//write(str, out);
 			for(Instruction inst : list)
 			{
 				switch(inst.command)
 				{
 					case ADD:
-						str += "mem[mempos] += " + Integer.toString(inst.value) + "; ";
+						for(int i = 0; i < looplevel; i++)
+							str += "\t";
+						str += "mem[mempos] += " + Integer.toString(inst.value) + ";\n";
 						break;
 					case SUB:
-						str += "mem[mempos] -= " + Integer.toString(inst.value) + "; ";
+						for(int i = 0; i < looplevel; i++)
+							str += "\t";
+						str += "mem[mempos] -= " + Integer.toString(inst.value) + ";\n";
 						break;
 					case LEFT:
-						str += "mempos -= " + Integer.toString(inst.value) + "; ";
+						for(int i = 0; i < looplevel; i++)
+							str += "\t";
+						str += "mempos -= " + Integer.toString(inst.value) + ";\n";
 						break;
 					case RIGHT:
-						str += "mempos += " + Integer.toString(inst.value) + "; "; 
+						for(int i = 0; i < looplevel; i++)
+							str += "\t";
+						str += "mempos += " + Integer.toString(inst.value) + ";\n"; 
 						break;
 					case START:
-						str += "while(mem[mempos] != 0){ ";
+						for(int i = 0; i < looplevel; i++)
+							str += "\t";
+						str += "while(mem[mempos] != 0){\n";
+						looplevel++;
 						break;
 					case END:
-						str += " } ";
+						looplevel--;
+						for(int i = 0; i < looplevel; i++)
+							str += "\t";
+						str += "}\n";
 						break;
 					case OUTPUT:
-						str += "printf(\"%c\", mem[mempos]); ";
+						for(int i = 0; i < looplevel; i++)
+							str += "\t";
+						str += "printf(\"%c\", mem[mempos]);\n";
 						break;
 					case INPUT:
-						str += "scanf(\" %c\", &(mem[mempos])); ";
+						for(int i = 0; i < looplevel; i++)
+							str += "\t";
+						str += "scanf(\" %c\", &(mem[mempos]));\n";
 						break;
 					default:
 						break;
 				}
 			}
-			str += "return 0;} ";
+			str += "\treturn 0;\n}";
 			write(str, out);
 			out.flush();
 		}
