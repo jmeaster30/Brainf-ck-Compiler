@@ -15,4 +15,8 @@ the -c flag means you want to compile the file
 --both of these flags can be put in you will just recieve the interpreted output right away and a compiled executable
 
 
-the -o \<filename\> will cause the compiled executable to be named "\<filename\>"
+the -o \<filename\> flag will cause the compiled executable to be named "\<filename\>"
+
+
+<h4>Notes:</h4>
+http//calmerthanyouare.org/2015/01/07/optimizing-brainfuck.html --- I found this blog post talking about some opltimizations you can make for brainfuck compilers and I got some ideas of how to make the optimizations more general.
