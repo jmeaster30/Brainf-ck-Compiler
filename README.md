@@ -19,4 +19,4 @@ the -o \<filename\> flag will cause the compiled executable to be named "\<filen
 
 
 <h4>Notes:</h4>
-http//calmerthanyouare.org/2015/01/07/optimizing-brainfuck.html --- I found this blog post talking about some opltimizations you can make for brainfuck compilers and I got some ideas of how to make the optimizations more general.
+http://calmerthanyouare.org/2015/01/07/optimizing-brainfuck.html --- I found this blog post talking about some opltimizations you can make for brainfuck compilers and I got some ideas of how to make the optimizations more general.
