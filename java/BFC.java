@@ -11,12 +11,15 @@ public class BFC
 		String filename = null;
 		String outputname = null;
 		String program = "";
-		
+    String targetname = "";
+
+    Target target = Target.C;
+
 		boolean comp = false;
 		boolean interp = false;
-		
+
 		FileInputStream in = null;
-		
+
 		int i = 0;
 		for(String arg : args)
 		{
@@ -24,16 +27,20 @@ public class BFC
 			if(arg.equals("-o")) outputname = args[i + 1];
 			if(arg.equals("-c")) comp = true;
 			if(arg.equals("-i")) interp = true;
+      if(arg.equals("-t")) targetname = args[i + 1];
 			if(i == args.length - 1) filename = arg;
 			i++;
 		}
-		
-		try 
+
+    if(targetname.toLowerCase().equals("c")) target = Target.C;
+    if(targetname.toLowerCase().equals("mips")) target = Target.MIPS;
+
+		try
 		{
 			in = new FileInputStream(filename);
-			
+
 			int c;
-			while ((c = in.read()) != -1) 
+			while ((c = in.read()) != -1)
 			{
 				if(c == '+' || c == '-' || c == '.' || c == ',' ||
 				   c == '[' || c == ']' || c == '<' || c == '>')
@@ -45,17 +52,17 @@ public class BFC
 		{
 			e.printStackTrace();
 		}
-		
+
 		//System.out.println(program);
 		if(interp)
 		{
 			Interpreter interpreter = new Interpreter(program);
 			interpreter.interpret();
-		}			
+		}
 		if(comp)
 		{
 			Compiler compiler = new Compiler(program, (outputname == null) ? "out" : outputname);
-			compiler.compile();
+			compiler.compile(target);
 		}
 	}
 }

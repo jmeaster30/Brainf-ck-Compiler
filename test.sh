@@ -2,18 +2,16 @@ if [[ -n "$1" ]]; then
 	echo "Running tests from $1"
 	if [[ "$1" == "java" ]]; then
 		cd $1
-		TESTS=(../tests/*)
+		TEST=(../tests/$2)
 		javac BFC.java
-		for f in "${TESTS[@]}"; do
-			echo "****** Executing test $f ******"
-			java BFC -c -i $f
-			echo ""
-		done
+	  echo "****** Executing test $2 ******"
+		java BFC -c $TEST
+		echo ""
 		cd ..
 	else
 		echo "that folder does not exist"
 	fi
-	./clean $1
+	./clean.sh $1
 else
 	echo "Specify which folder to run the tests from"
 fi

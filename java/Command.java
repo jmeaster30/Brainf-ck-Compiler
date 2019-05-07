@@ -6,6 +6,8 @@ public enum Command
 	RIGHT,
 	ADD,
 	SUB,
+  CLEAR,
+  MULT,
 	OUTPUT,
 	INPUT;
 }
