@@ -8,6 +8,14 @@ if [[ -n "$1" ]]; then
 		java BFC -t $2 -c $TEST
 		echo ""
 		cd ..
+  elif [[ "$1" == "c" ]]; then
+    cd $1
+		TEST=(../tests/$3)
+		./compile.sh
+	  echo "****** Executing test $3 ******"
+		./bfc -t $2 -c -i $TEST
+		echo ""
+		cd ..
 	else
 		echo "that folder does not exist"
 	fi

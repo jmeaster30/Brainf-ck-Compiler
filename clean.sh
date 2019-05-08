@@ -9,6 +9,8 @@ if [[ -n "$1" ]]; then
 		elif [[ -z "$FILES" ]]; then
 			echo "Folder is clean."
 		fi
+  elif [[ "$1" == "c" ]]; then
+    echo "Folder is clean."
 	else
 		echo "that folder does not exist"
 	fi
