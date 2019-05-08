@@ -7,6 +7,9 @@ Once you build either the java or the c version* of this program run it like any
 
 the file you want to interpret or compile will be the last parameter
 
+the -t <target> flag is for specifying what target you would like to compile to.
+
+currently you can compile into C code or MIPS assembly 
 
 the -i flag means you want to interpret the file
 
