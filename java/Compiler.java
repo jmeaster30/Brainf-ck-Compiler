@@ -13,25 +13,27 @@ public class Compiler
 		outputFilename = o;
 	}
 
-	//public void matchLoopBrackets(ArrayList<Instruction> list)
-	//{
-	//	Deque<Integer> loopStartIndex = new ArrayDeque<Integer>();
-	//	for(int i = 0; i < list.size(); i++)
-	//	{
-	//		Instruction inst = list.get(i);
-	//		if(inst.command == Command.START)
-	//		{
-	//			loopStartIndex.addFirst(i);
-	//		}
-	//		else if(inst.command == Command.END)
-	///		{
-	//			int index = loopStartIndex.removeFirst();
-	//			Instruction start = list.get(index);
-	//			inst.value = index;
-	//			start.value = i;
-	//		}
-	//	}
-	//}
+	public void matchLoopBrackets(ArrayList<Instruction> list)
+	{
+		Deque<Integer> loopStartIndex = new ArrayDeque<Integer>();
+    int num = 1;
+		for(int i = 0; i < list.size(); i++)
+		{
+			Instruction inst = list.get(i);
+			if(inst.command == Command.START)
+			{
+				loopStartIndex.addFirst(i);
+			}
+			else if(inst.command == Command.END)
+			{
+				int index = loopStartIndex.removeFirst();
+				Instruction start = list.get(index);
+				inst.value = num;
+				start.value = num;
+        num++;
+			}
+		}
+	}
 
 	//this functions folds instructions that are repeated.
 	//the resulting list is shorter and thus when it is compiled it is optimized slightly
@@ -380,22 +382,14 @@ public class Compiler
 	public int outputC(ArrayList<Instruction> list, int memRequired)
 	{
 		BufferedWriter out = null;
-		BufferedReader in = null;
 
 		try
 		{
 			out = new BufferedWriter(new FileWriter(outputFilename + ".c"));
-      //takes in the base c code needed
-			in = new BufferedReader(new FileReader("base.base"));
-			int c;
-			while ((c = in.read()) != -1)
-			{
-				out.write(c);
-				//out.flush();
-			}
-			in.close();
+      //base c code needed
+			String str = "#include <stdlib.h>\n#include <stdio.h>\n#include <string.h>\nunsigned char* mem;\nint mempos = 0;\nint main(){\n";
 			int looplevel = 1;
-			String str = "\tmem = (unsigned char*)malloc(sizeof(unsigned char) * " + Integer.toString(memRequired) + ");\n\tmemset(mem, 0, sizeof(unsigned char) * " + Integer.toString(memRequired) + ");\n";
+			str += "\tmem = (unsigned char*)malloc(sizeof(unsigned char) * " + Integer.toString(memRequired) + ");\n\tmemset(mem, 0, sizeof(unsigned char) * " + Integer.toString(memRequired) + ");\n";
 			//write(str, out);
 			for(Instruction inst : list)
 			{
@@ -468,9 +462,111 @@ public class Compiler
 		return 0;
 	}
 
-  public void outputMIPS(ArrayList<Instruction> list, int memRequired)
+  public int outputMIPS(ArrayList<Instruction> list, int memRequired)
   {
-
+    BufferedWriter out = null;
+    //$a0 is current cell value
+    //$a1 is a temp register for multiplication
+    //$t0 is the current memory position
+    //$t1 address of memory
+    //$t2 memory location
+		try
+		{
+			out = new BufferedWriter(new FileWriter(outputFilename + ".s"));
+      String str = ".data\n";
+      str += "mem: .byte ";
+      for(int i = 0; i < memRequired - 1; i++)
+        str += "0,";
+      str += "0\n";
+      str += ".text\n" +
+             "main: \n" +
+             "addiu $t0, $0, 0\n" +//make sure memorr start position is zero
+             "la $t1, mem\n" +
+             "addu $t2, $t1, $t0\n";
+			//write(str, out);
+			for(Instruction inst : list)
+			{
+				switch(inst.command)
+				{
+					case ADD:
+            str += "lb $a0, 0($t2)\n";
+            str += "addiu $a0, $a0, " + inst.value + "\n";
+            str += "sb $a0, 0($t2)\n";
+            //need to consider overflow and wrapping the calulation around without affecting other cells
+						break;
+					case SUB:
+            str += "lb $a0, 0($t2)\n";
+            str += "addiu $a0, $a0, -" + inst.value + "\n";
+            str += "sb $a0, 0($t2)\n";
+            //need to consider overflow and wrapping the calulation around without affecting other cells
+						break;
+					case LEFT:
+            str += "addiu $t0, $t0, -" + inst.value + "\n";
+            str += "addu $t2, $t1, $t0\n";
+						break;
+					case RIGHT:
+            str += "addiu $t0, $t0, " + inst.value + "\n";
+            str += "addu $t2, $t1, $t0\n";
+						break;
+					case START:
+            str += "SL" + inst.value +  ":\n";
+            str += "lb $a0, 0($t2)\n";
+            str += "beq $a0, $0, EL" + inst.value + "\n";
+						break;
+					case END:
+            str += "j SL" + inst.value + "\n";
+            str += "EL" + inst.value +  ":\n";
+						break;
+					case OUTPUT:
+            str += "lb $a0, 0($t2)\n";
+            str += "jal output\n";
+						break;
+					case INPUT:
+            str += "jal input\n";
+            str += "sb $a0, 0($t2)\n";
+						break;
+          case CLEAR:
+            str += "sb $0, 0($t2)\n";
+            break;
+          case MULT:
+            //do multiplication
+            str += "lb $a0, 0($t2)\n";
+            str += "addiu $a1, $0, " + inst.value + "\n";
+            str += "multu $a0, $a1\n";
+            str += "mflo $a1\n";
+            str += "andi $a1, $a1, 255\n";//makes sure our number is a byte
+            //need to consider overflow and wrapping the calulation around without affecting other cells
+            //a1 contains th multiply result
+            str += "lb $a0, " + inst.offset + "($t2)\n";
+            str += "addu $a0, $a0, $a1\n";
+            str += "sb $a0, " + inst.offset + "($t2)\n";
+            break;
+					default:
+						break;
+				}
+			}
+      str += "li $v0, 10 # exit\n" +
+             "syscall\n";
+      str += "\n.text\n" +
+             ".globl output\n" +
+             ".globl input\n\n" +
+             "output: \n" +
+             "li $v0, 11 #print_char\n" +
+             "syscall\n" +
+             "jr $ra\n" +
+             "input: \n" +
+             "li $v0, 12 #read_char\n" +
+             "syscall\n" +
+             "move $a0, $v0\n" +
+             "jr $ra\n";
+			write(str, out);
+			out.flush();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return 0;
   }
 
 	//compiles the program
@@ -489,10 +585,11 @@ public class Compiler
     System.out.println("Instruction count (after optimizations): " + instructionList.size());
     //for(Instruction inst : instructionList)
     //  System.out.println(inst.command + ", " + inst.value + ", " + inst.offset);
+    matchLoopBrackets(instructionList);
     switch(t)
     {
       case C:
-        outputC(instructionList, 2 * memRequired);
+        outputC(instructionList, memRequired);
         break;
       case MIPS:
         outputMIPS(instructionList, memRequired);

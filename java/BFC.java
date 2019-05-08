@@ -35,6 +35,18 @@ public class BFC
     if(targetname.toLowerCase().equals("c")) target = Target.C;
     if(targetname.toLowerCase().equals("mips")) target = Target.MIPS;
 
+    if((!comp && !interp) || filename == null)
+    {
+      System.out.println("Usage: bfc -t (C | MIPS) -c -i -o (FILENAME) (SOURCE)\n" +
+                         "\t-t TARGET will compile into TARGET(by default this will compile into C)\n" +
+                         "\t\tTARGETS: C, MIPS\n" +
+                         "\t-c flag to specify you would like to compile the brainfuck code\n" +
+                         "\t-i flag to specify you would like to interpret the brainfuck code\n" +
+                         "\t-o FILENAME specifies you would like the output file to be of name FILENAME\n" +
+                         "NOTE: always end the command with the brainfuck source file. However the other flags can be in any order you want.\n");
+      return;
+    }
+
 		try
 		{
 			in = new FileInputStream(filename);

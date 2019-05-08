@@ -3,11 +3,16 @@ if [[ -n "$1" ]]; then
 	if [[ "$1" == "java" ]]; then
 		cd $1
 		TESTS=(../tests/*)
+    TARGETS=(C MIPS)
 		javac BFC.java
 		for f in "${TESTS[@]}"; do
 			echo "****** Executing test $f ******"
-			java BFC -c -i $f
-			echo ""
+      for t in "${TARGETS[@]}"; do
+        echo ">>>>>> Building target $t <<<<<<"
+  			java BFC -t $t -c $f
+        echo ">>>>>> Target $t finished <<<<<<"
+      done
+			echo "****** Test $f finished! ******"
 		done
 		cd ..
 	else

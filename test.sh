@@ -2,10 +2,10 @@ if [[ -n "$1" ]]; then
 	echo "Running tests from $1"
 	if [[ "$1" == "java" ]]; then
 		cd $1
-		TEST=(../tests/$2)
+		TEST=(../tests/$3)
 		javac BFC.java
-	  echo "****** Executing test $2 ******"
-		java BFC -c $TEST
+	  echo "****** Executing test $3 ******"
+		java BFC -t $2 -c $TEST
 		echo ""
 		cd ..
 	else
