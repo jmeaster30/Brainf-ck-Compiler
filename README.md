@@ -17,12 +17,10 @@ Specifies that you would like to interpret the source file.
 * -c
 Specifies that you would like to compile the source file.
 
+##### At least one of the -i and -c flags are required
 
---both of these flags can used at the same time you will just recieve the interpreted output right away and a compiled executable
-
-
-the -o \<filename\> flag will cause the compiled executable to be named "\<filename\>"
-
+* -o \<filename\> 
+Specifies the name of the output file by default it is called "out"
 
 ## Notes:
 http://calmerthanyouare.org/2015/01/07/optimizing-brainfuck.html --- I found this blog post talking about some opltimizations you can make for brainfuck compilers and I got some ideas of how to make the optimizations more general.
