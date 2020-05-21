@@ -37,13 +37,13 @@ public class BFC
 
     if((!comp && !interp) || filename == null)
     {
-      System.out.println("Usage: bfc -t (C | MIPS) -c -i -o (FILENAME) (SOURCE)\n" +
+      System.out.println("Usage: bfc -c (SOURCE)\n" +
                          "\t-t TARGET will compile into TARGET(by default this will compile into C)\n" +
                          "\t\tTARGETS: C, MIPS\n" +
-                         "\t-c flag to specify you would like to compile the brainfuck code\n" +
-                         "\t-i flag to specify you would like to interpret the brainfuck code\n" +
+                         "\t-c flag to specify you would like to compile the brainf*ck code\n" +
+                         "\t-i flag to specify you would like to interpret the brainf*ck code\n" +
                          "\t-o FILENAME specifies you would like the output file to be of name FILENAME\n" +
-                         "NOTE: always end the command with the brainfuck source file. However the other flags can be in any order you want.\n");
+                         "NOTE: always end the command with the brainf*ck source file.\n");
       return;
     }
 
@@ -63,7 +63,8 @@ public class BFC
 		catch(Exception e)
 		{
 			e.printStackTrace();
-		}
+		  return;
+    }
 
 		//System.out.println(program);
 		if(interp)

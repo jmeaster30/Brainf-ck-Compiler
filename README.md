@@ -2,24 +2,27 @@
 
 This is an interpreter/compiler for the Brainf*ck esoteric programming language.
 
-Once you build either the java or the c version* of this program run it like any other program but there are flags to control the program a bit:
+## Usage:
+Run the 'bfc' script in a command line followed by the brainf*ck source to compile or interpret it.
+
+### Flags:
+
+* -t <target>
+Used for specifying what target you would like to compile to.
+Currently there are only two options: C, MIPS  
+
+* -i
+Specifies that you would like to interpret the source file.
+
+* -c
+Specifies that you would like to compile the source file.
 
 
-the file you want to interpret or compile will be the last parameter
-
-the -t <target> flag is for specifying what target you would like to compile to.
-
-currently you can compile into C code or MIPS assembly 
-
-the -i flag means you want to interpret the file
-
-the -c flag means you want to compile the file
-
---both of these flags can be put in you will just recieve the interpreted output right away and a compiled executable
+--both of these flags can used at the same time you will just recieve the interpreted output right away and a compiled executable
 
 
 the -o \<filename\> flag will cause the compiled executable to be named "\<filename\>"
 
 
-<h4>Notes:</h4>
+## Notes:
 http://calmerthanyouare.org/2015/01/07/optimizing-brainfuck.html --- I found this blog post talking about some opltimizations you can make for brainfuck compilers and I got some ideas of how to make the optimizations more general.

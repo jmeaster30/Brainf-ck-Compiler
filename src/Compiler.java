@@ -569,20 +569,19 @@ public class Compiler
 		return 0;
   }
 
-	//compiles the program
-	//for now it will just generate c code
+	//compiles the program	
 	public int compile(Target t)
 	{
 		ArrayList<Instruction> instructionList = generateInstructionList(program);
 
-		System.out.println("Instruction count (before optimizations): " + instructionList.size());
+		System.out.println("IR Instruction count (before optimizations): " + instructionList.size());
     //for(Instruction inst : instructionList)
     //  System.out.println(inst.command + ", " + inst.value + ", " + inst.offset);
     int memRequired = memoryNeeded(instructionList);
     System.out.println("Memory required: " + memRequired);
 
     optimize(instructionList);
-    System.out.println("Instruction count (after optimizations): " + instructionList.size());
+    System.out.println("IR Instruction count (after optimizations): " + instructionList.size());
     //for(Instruction inst : instructionList)
     //  System.out.println(inst.command + ", " + inst.value + ", " + inst.offset);
     matchLoopBrackets(instructionList);
